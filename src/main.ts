@@ -1,6 +1,9 @@
 import { Reminder } from "./reminder";
 import * as Discord from 'discord.js';
 
+// Info on changing user's nick names
+//https://stackoverflow.com/questions/41247353/change-user-nickname-with-discord-js
+
 let secrets = require("../secrets.json");
 
 //const Discord = require('discord.js');
@@ -100,7 +103,7 @@ client.on('message', msg => {
           msg.channel.send("Valid data message.")
           console.log("Valid data message.");
         } else {
-          msg.channel.send("Try again dumbfuck");
+          msg.channel.send("That wasn't quite right, follow the format below.");
           msg.channel.send("?remind $Title$ |Location| 01/12/2019 12:00-01/12/2019 12:50");
         }
       }

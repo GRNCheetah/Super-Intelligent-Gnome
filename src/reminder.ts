@@ -26,8 +26,6 @@ export class Reminder {
     }
 
     save() {
-        console.log("Saving new reminder.");
-
         let remi: string = fs.readFileSync('reminders.json', 'utf8');   // String representing the entire reminders.json file
         let remiList: Reminder[];       // List of Reminder objects
         
@@ -46,10 +44,8 @@ export class Reminder {
 
         fs.writeFileSync("reminders.json", JSON.stringify(comboRemi), (err: any) => {
             if (err) {
-                console.log("Save failed");
                 throw err;
             }
-            console.log('The file has been saved!');
         });
     }
 }
