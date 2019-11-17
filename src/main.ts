@@ -6,8 +6,6 @@ let secrets = require("../secrets.json");
 //const Discord = require('discord.js');
 const client = new Discord.Client();
 
-
-
 client.on('ready', () => {
   console.log('Logged in as $(client.user.tag)!');
 });
@@ -49,7 +47,7 @@ client.on('message', msg => {
         let locationArr: RegExpMatchArray;
         let datetimeArr: RegExpMatchArray;
       
-        const patt_name: RegExp = /\*(.{1,32})\*/i;
+        const patt_name: RegExp = /\$(.{1,32})\$/i;
         const patt_location: RegExp = /\|(.{1,32})\|/i;
         const patt_datetime: RegExp = /((0[1-9]|1[0-2])\/([0-2][1-9]|3[0-1])\/(20[0-9][0-9]) (0[1-9]|1[0-2]):([0-5][0-9]))-((0[1-9]|1[0-2])\/([0-2][1-9]|3[0-1])\/(20[0-9][0-9]) (0[1-9]|1[0-2]):([0-5][0-9]))/i;
         
@@ -60,7 +58,7 @@ client.on('message', msg => {
         if (nameArr) {
           name = nameArr[1];
         } else {
-          msg.channel.send("Name was not valid. Needs to be between 1 and 32 characters, in between **.");
+          msg.channel.send("Name was not valid. Needs to be between 1 and 32 characters, in between $$.");
           validConfig = false;
         }
 
@@ -73,11 +71,18 @@ client.on('message', msg => {
         
         if (datetimeArr) {
           // If datetime was found, pull them from the array
+          let currdate = new Date();
           startdate = new Date(datetimeArr[1]);
           enddate = new Date(datetimeArr[7]);
 
-          //msg.channel.send(startdate.toLocaleString());
-          //msg.channel.send(enddate.toLocaleString());
+          // First check that start datetime is after current datetime
+          // Then check that end datetime is after start datetime
+
+          if (startdate.getTime() < currdate.getTime() || enddate.getTime() < startdate.getTime()) {
+            msg.channel.send("Date was not valid. Your times are in the past.");
+            validConfig = false;
+          }
+          
         } else {
           msg.channel.send("Date was not valid. ex) 01/12/2019 12:00-01/12/2019 12:50");
           validConfig = false;
@@ -85,21 +90,16 @@ client.on('message', msg => {
         
 
         if (validConfig) {
+          // Got a valid data message, send it to the db
+          let newReminder = new Reminder(name, location, startdate, enddate);
+          newReminder.save();
+
           msg.channel.send("Valid data message.")
           console.log("Valid data message.");
         } else {
           msg.channel.send("Try again dumbfuck");
-          msg.channel.send("?remind *Title* |Location| 01/12/2019 12:00-01/12/2019 12:50");
+          msg.channel.send("?remind $Title$ |Location| 01/12/2019 12:00-01/12/2019 12:50");
         }
-
-
-        //console.log(datetime);
-        // var indexBracket = 0;
-        // var indexHyphen = 0;
-        // indexBracket = msg.content.indexOf('[');
-        // indexHyphen = msg.content.indexOf('-');
-
-        
       }
 
       //let newReminder = new Reminder("Get this done", "CS 327", "Now", "Later");
@@ -108,12 +108,9 @@ client.on('message', msg => {
     }
 
     else {
-      msg.channel.send("I'm not sure what you mean.");
-
+      msg.channel.send("I'm not sure what you mean. This doesn't appear to be a command.");
     }
-
   }
-
 });
 
 

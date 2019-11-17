@@ -18,4 +18,8 @@ export class Reminder {
     get_name(): string {
         return this.name;
     }
+
+    save() {
+        console.log("Saving new reminder.");
+    }
 }
