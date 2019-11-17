@@ -38,11 +38,13 @@ client.on('message', msg => {
       } else {
         let validConfig: boolean = true;
 
+        // Vars to pass to the Reminder Object
         let name: string;
         let location: string;
         let startdate: Date;
         let enddate: Date;
 
+        // What to populate after regex matches
         let nameArr: RegExpMatchArray;
         let locationArr: RegExpMatchArray;
         let datetimeArr: RegExpMatchArray;
@@ -51,6 +53,7 @@ client.on('message', msg => {
         const patt_location: RegExp = /\|(.{1,32})\|/i;
         const patt_datetime: RegExp = /((0[1-9]|1[0-2])\/([0-2][1-9]|3[0-1])\/(20[0-9][0-9]) (0[1-9]|1[0-2]):([0-5][0-9]))-((0[1-9]|1[0-2])\/([0-2][1-9]|3[0-1])\/(20[0-9][0-9]) (0[1-9]|1[0-2]):([0-5][0-9]))/i;
         
+        // Dissect the user message
         nameArr = msg.content.match(patt_name);
         locationArr = msg.content.match(patt_location);
         datetimeArr = msg.content.match(patt_datetime);
@@ -101,10 +104,6 @@ client.on('message', msg => {
           msg.channel.send("?remind $Title$ |Location| 01/12/2019 12:00-01/12/2019 12:50");
         }
       }
-
-      //let newReminder = new Reminder("Get this done", "CS 327", "Now", "Later");
-
-      //console.log(newReminder);
     }
 
     else {

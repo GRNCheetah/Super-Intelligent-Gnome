@@ -1,7 +1,7 @@
 {
   "name": "typescript_discord",
+  "description": "fadfs",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node out/main.js",
@@ -15,12 +15,16 @@
     "googleapis": "^45.0.0",
     "nodemon": "^1.19.4",
     "ts-node": "^3.3.0",
-    "typescript": "^2.9.2"
+    "typescript": "^2.9.2",
+    "mysql": "^2.10.2"
   },
   "devDependencies": {},
   "keywords": [
     "urmom"
   ],
   "author": "Gavin Lewis",
-  "license": "ISC"
+  "license": "ISC",
+  "nodemonConfig": {
+    "ignore": ["out/", "reminders.json"]
+  }
 }
