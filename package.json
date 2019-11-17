@@ -1,0 +1,26 @@
+{
+  "name": "typescript_discord",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node out/main.js",
+    "dev": "nodemon src/main.ts",
+    "build": "tsc -p .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@types/node": "^12.12.8",
+    "discord.js": "^11.5.1",
+    "googleapis": "^45.0.0",
+    "nodemon": "^1.19.4",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.9.2"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "urmom"
+  ],
+  "author": "Gavin Lewis",
+  "license": "ISC"
+}
