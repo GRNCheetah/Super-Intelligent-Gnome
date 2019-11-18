@@ -2,3 +2,4 @@ node_modules/
 out/
 secrets.json
 reminders.json
+server_info.json

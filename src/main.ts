@@ -1,4 +1,5 @@
 import { Reminder, ReminderLoader } from "./reminder";
+//import * as server_info from '../server_info.json'
 import * as Discord from 'discord.js';
 import { fstat } from "fs";
 
@@ -7,44 +8,59 @@ import { fstat } from "fs";
 // setInterval() might be able to be used to delay a timed message
 // Could also just add a command only officers could use to push the events
 
+interface DISCORD_INFO {
+  ACMGeneral: {
+    guild: string;
+    channel: string;
+  };
+  CDT: {
+    guild: string;
+    channel: string;
+  };
+};
 
-let secrets = require("../secrets.json");
+let secrets: { discord: string } = require("../secrets.json");
+let server_info = require("../server_info.json");
 
-//const Discord = require('discord.js');
 const client = new Discord.Client();
 
-// Create data on Guilds connected to
-// Lets the bot know where the anouncements channel is for each 
-/* 
-{
-  "guilds": {
-    "general": {
-      "id":
-    },
-    "sec": {
-      "id"
+
+
+// const DISCORD_INFO: ACMGuilds = {
+//   ACMGeneral: {
+//     guild: "276873078703783948",
+//     channel: ""
+//   },
+//   CDT: {
+//     guild: "277576792334925834",
+//     channel: "511977781207367680"
+//   }
+// };
+
+function send_to_channel(destination: string, message: string): void {
+  let guild: Discord.Guild = client.guilds.find(guild => guild.name === server_info[destination].guild);
+  if (guild) {
+    let channel: Discord.TextChannel = guild.channels.find(channel => channel.name === server_info[destination].channel) as Discord.TextChannel;
+    if (channel) {
+      channel.send(message);
+    } else {
+      console.log("Channel: " + server_info[destination].channel + " not found");
     }
+  } else {
+    console.log("Guild: " + server_info[destination].guild + " not found");
   }
+};
 
-}
-*/
-
-function update_guild_info() {
-  // Save anouncement channel information
-  // client is global so we gucci
-  let guild_ACMGeneral: Discord.Guild = client.guilds.find(guild => guild.name === "ACM General");
-
-
-}
 
 client.on('ready', () => {
   console.log('Logged in as ' + client.user.tag);
   
+  // Example for sending messages at a set time.
   //let interval = setInterval(function() { console.log("Hello"); }, 150);
   let guilds = client.guilds;
-  //console.log(guilds);
-  //console.log(client.guilds.find(guild => guild.name === "ACM General"));
-  //update_guild_info();
+
+  // Send test announcement to the CDT Discord  
+  // send_to_channel("CDT", "This is a test");
 });
 
 client.on('message', msg => {
@@ -96,12 +112,13 @@ client.on('message', msg => {
           sendMsg = false;
         }
 
+        // Make sure user picked a valid reminder
         if (sendMsg) {
           let targetDiscords: Array<string> = args[3].split("|");
+          // Parse what server to send the reminder to
           if (targetDiscords.indexOf('everyone') > -1) {
             // Send to all discords
             singleSends = false;    // Don't doouble send to individual stuff
-
           }
 
           if (singleSends) {
