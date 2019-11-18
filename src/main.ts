@@ -117,6 +117,7 @@ client.on('message', msg => {
         if (args[2] === "all") {
           // Push all the reminders
           // Probably shouldn't do this one
+          console.log("This will be implemented later.");
         } else if (typeof args[2] === "string" && !isNaN(Number(args[2]))) {
           // Push just the number given
           reminder = reminderLoader.get_reminderByNum(Number(args[2]));
@@ -224,7 +225,7 @@ client.on('message', msg => {
 
         if (validConfig) {
           // Got a valid data message, send it to the db
-          let newReminder = new Reminder(name, location, startdate, enddate);
+          let newReminder = new Reminder(msg.author.toString(), name, location, startdate, enddate);
           newReminder.save();
 
           msg.channel.send("Valid data message.")
