@@ -38,17 +38,24 @@ const client = new Discord.Client();
 // };
 
 function send_to_channel(destination: string, message: string): void {
-  let guild: Discord.Guild = client.guilds.find(guild => guild.name === server_info[destination].guild);
-  if (guild) {
-    let channel: Discord.TextChannel = guild.channels.find(channel => channel.name === server_info[destination].channel) as Discord.TextChannel;
-    if (channel) {
-      channel.send(message);
+  try {
+    let guild: Discord.Guild = client.guilds.find(guild => guild.name === server_info[destination].guild);
+    if (guild) {
+      let channel: Discord.TextChannel = guild.channels.find(channel => channel.name === server_info[destination].channel) as Discord.TextChannel;
+      if (channel) {
+        channel.send(message);
+      } else {
+        console.log("Channel: " + server_info[destination].channel + " not found");
+      }
     } else {
-      console.log("Channel: " + server_info[destination].channel + " not found");
+      console.log("Guild: " + server_info[destination].guild + " not found");
     }
-  } else {
-    console.log("Guild: " + server_info[destination].guild + " not found");
   }
+  catch (err) {
+    console.log("Error sending the message.");
+    throw err;
+  }
+  
 };
 
 
@@ -91,13 +98,20 @@ client.on('message', msg => {
       } else if (args[1] === "-p") {
         // This is for pushing reminders to the masses
         // Set some flags so code isn't repeated
-        // ?remind -p [all|n] [everyone|web|sec|w|game|comp|data|hack]
+        // ?remind -p [all|n] |everyone|web|sec|w|game|comp|data|hack|
         //let reminderNum: number = 0;  // The reminder number in the list [0+]
-        let toSend: string = "";      // The string to send to the discords
-        let reminderLoader: ReminderLoader = new ReminderLoader();
+        let toSend: string = "";          // The string to send to the discords, determined by reminder
+        
+        let reminderLoader: ReminderLoader = new ReminderLoader();    // Used to load reminders from storage
         let reminder: Reminder;           // The Reminder object to send
+
         let sendMsg: boolean = true;      // Goes false if there is not a specified reminder to push
         let singleSends: boolean = true;  // Goes false if everyone is in the 'to send' part of the message
+        
+        // Right now checks that coms are like |sec|web|
+        // Need opening and closing pipes
+        let patt_communities: RegExp = /\|(\w+\|){1,7}/i;
+        let communitiesArr: RegExpMatchArray = msg.content.match(patt_communities);
 
         // Determines which reminder to push
         if (args[2] === "all") {
@@ -114,37 +128,35 @@ client.on('message', msg => {
 
         // Make sure user picked a valid reminder
         if (sendMsg) {
-          let targetDiscords: Array<string> = args[3].split("|");
+          // Split on |, make Uppercase bc that's what is in server_info.json
+          // The map part trims whitespace of individual parts, so 'sec |sec' won't double send
+          let targetDiscords: string[] = communitiesArr[0].toLocaleUpperCase().split("|").map(item => item.trim());
+          let filteredTargets: string[] = [];
+          targetDiscords.filter((item: string, index: number) => {
+            if (targetDiscords.indexOf(item) === index)
+              filteredTargets.push(item);
+          });
+          console.log(filteredTargets);
           // Parse what server to send the reminder to
-          if (targetDiscords.indexOf('everyone') > -1) {
+          if (filteredTargets.indexOf('EVERYONE') > -1) {
             // Send to all discords
             singleSends = false;    // Don't doouble send to individual stuff
           }
 
           if (singleSends) {
-            if (targetDiscords.indexOf('web')) {
-
-            }
-            if (targetDiscords.indexOf('sec')) {
-
-            }
-            if (targetDiscords.indexOf('w')) {
-
-            }
-            if (targetDiscords.indexOf('comp')) {
-
-            }
-            if (targetDiscords.indexOf('hack')) {
-
-            }
-            if (targetDiscords.indexOf('data')) {
-
-            }
-            if (targetDiscords.indexOf('game')) {
-
-            }
+            //console.log(setTarDiscords)
+            filteredTargets.forEach( function(community: string) {
+              // If input is '|sec|web|', the array will contain ['', 'SEC', 'WEB'],
+              // b/c .split('|') still matches the first '|'. Make sure the item we
+              // are sending to is not an empty string.
+              // This will still attempt to send to communities that do not exist,
+              // but we can just let the user know what communities we have sent to.
+              if (community) {
+                //send_to_channel(community.trim(), toSend);
+                console.log("Simulate sending");
+              }
+            });
           }
-          
         }
 
 
