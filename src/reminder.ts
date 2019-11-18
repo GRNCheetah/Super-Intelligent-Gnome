@@ -9,20 +9,25 @@ interface Rems {
 
 export class Reminder {
     // Define member variables
+    private creator: string;
     private name: string;
     private location: string;
     private startDateTime: Date;
     private endDateTime: Date;
 
-    constructor(name:string, location: string, startDateTime: Date, endDateTime: Date) {
+    constructor(creator: string, name:string, location: string, startDateTime: Date, endDateTime: Date) {
         this.name = name;
         this.location = location;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
     }
 
-    get_name(): string {
-        return this.name;
+    to_string(): string {
+        let formatted: string = "";
+
+
+
+        return formatted;
     }
 
     save() {
