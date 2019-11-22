@@ -1,29 +1,26 @@
 import { Reminder, ReminderLoader } from "./reminder";
-//import * as server_info from '../server_info.json'
+
 import * as Discord from 'discord.js';
-import { fstat } from "fs";
+const Discord = require('discord.js');
+import fs = require('fs');
 
 // Info on changing user's nick names
 //https://stackoverflow.com/questions/41247353/change-user-nickname-with-discord-js
 // setInterval() might be able to be used to delay a timed message
 // Could also just add a command only officers could use to push the events
 
-interface DISCORD_INFO {
-  ACMGeneral: {
-    guild: string;
-    channel: string;
-  };
-  CDT: {
-    guild: string;
-    channel: string;
-  };
-};
+// Info on seperating out the commands, kind of works but feels a bit wonk
+// Maybe just because im tired
+//https://discordjs.guide/command-handling/adding-features.html#a-dynamic-help-command
+
 
 let secrets: { discord: string } = require("../secrets.json");
 let server_info = require("../server_info.json");
 
-const client = new Discord.Client();
 
+const client = new Discord.Client();
+client.commands = new Discord.Collection();
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
 
 // const DISCORD_INFO: ACMGuilds = {
