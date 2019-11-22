@@ -21,8 +21,9 @@ export class Reminder {
         this.endDateTime = endDateTime;
     }
 
-    get_name(): string {
-        return this.name;
+    get_string(): string {
+        return `Reminder for ${this.name} at ${this.location}: Starts at: ${this.startDateTime} and ends at: ${this.endDateTime}`
+        // return this.name;
     }
 
     save() {
@@ -71,10 +72,14 @@ export class ReminderLoader {
 
     get_reminderByNum(num: number): Reminder {
         // Returns a single Reminder
-        if (num >= 0 && num < this.numReminders) {
+        if (this.valid_num(num)) {
             return this.reminderList[num];
         } else {
             return null
         }
+    }
+
+    valid_num(num: number): boolean {
+        return (num >= 0 && num < this.numReminders);
     }
 }

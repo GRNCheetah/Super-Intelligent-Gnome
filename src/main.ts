@@ -8,23 +8,26 @@ import { fstat } from "fs";
 // setInterval() might be able to be used to delay a timed message
 // Could also just add a command only officers could use to push the events
 
-interface DISCORD_INFO {
-  ACMGeneral: {
-    guild: string;
-    channel: string;
-  };
-  CDT: {
-    guild: string;
-    channel: string;
-  };
+interface DISCORD_DATA {
+  guild: string,
+  channel: string
 };
 
-let secrets: { discord: string } = require("../secrets.json");
+interface DISCORD_INFO {
+  ACMGeneral: DISCORD_DATA,
+  CDT: DISCORD_DATA
+};
+
+interface CONFIG {
+  prefix: string,
+  token: string
+}
+
+//let secrets: { discord: string } = require("../secrets.json");
+const config: CONFIG = require("../config.json");
 let server_info = require("../server_info.json");
 
 const client = new Discord.Client();
-
-
 
 // const DISCORD_INFO: ACMGuilds = {
 //   ACMGeneral: {
@@ -37,25 +40,49 @@ const client = new Discord.Client();
 //   }
 // };
 
-function send_to_channel(destination: string, message: string): void {
-  try {
-    let guild: Discord.Guild = client.guilds.find(guild => guild.name === server_info[destination].guild);
-    if (guild) {
-      let channel: Discord.TextChannel = guild.channels.find(channel => channel.name === server_info[destination].channel) as Discord.TextChannel;
-      if (channel) {
-        channel.send(message);
-      } else {
-        console.log("Channel: " + server_info[destination].channel + " not found");
-      }
-    } else {
-      console.log("Guild: " + server_info[destination].guild + " not found");
-    }
-  }
-  catch (err) {
-    console.log("Error sending the message.");
-    throw err;
+function send_to_channel(targets: string, message: string): void {
+  // targets: A string that looks like |sec|web|
+  // message: The exact string you want sent
+
+  let filteredTargets: string[] = [];
+
+  if (targets.indexOf("EVERYONE") === -1) {
+    let targetDiscords: string[] = targets.toLocaleUpperCase().split("|").map(item => item.trim());
+  
+    targetDiscords.filter((item: string, index: number) => {
+    if (targetDiscords.indexOf(item) === index)
+      filteredTargets.push(item);
+    });
+  } else {
+    // Add all communities to the targets if everyone was there or no one was
+    filteredTargets = ["GEN", "SEC", "WEB", "GAME", "COMP", "W", "HACK", "DATA", "CDT"];
   }
   
+  // TODO: Add a check back to the user in an embed to make sure all info is correct before sending
+
+  console.log(filteredTargets);
+
+  filteredTargets.forEach( function(community: string) {
+    if (community) {
+      try {
+        let guild: Discord.Guild = client.guilds.find(guild => guild.name === server_info[community].guild);
+        if (guild) {
+          let channel: Discord.TextChannel = guild.channels.find(channel => channel.name === server_info[community].channel) as Discord.TextChannel;
+          if (channel) {
+            channel.send(message);
+          } else {
+            console.log("Channel: " + server_info[community].channel + " not found");
+          }
+        } else {
+          console.log("Guild: " + server_info[community].guild + " not found");
+        }
+      }
+      catch (err) {
+        console.log("Error sending the message.");
+        throw err;
+      }
+    }
+  })
 };
 
 
@@ -72,7 +99,7 @@ client.on('ready', () => {
 
 client.on('message', msg => {
 
-  // ignore bots and self
+  // ignore bots and self, and messages that dont start with prefix
   if (msg.author.bot) return;
 
   var args:string[] = msg.content.split(' ', 4);
@@ -83,6 +110,10 @@ client.on('message', msg => {
   if (msg.content === 'ping') {
     msg.channel.send('pong');
     //msg.reply('pong');
+  }
+
+  if (msg.content === '?tada') {
+    msg.channel.send('Its not party time.')
   }
 
   if (cmdSwitch === '?') {
@@ -106,7 +137,6 @@ client.on('message', msg => {
         let reminder: Reminder;           // The Reminder object to send
 
         let sendMsg: boolean = true;      // Goes false if there is not a specified reminder to push
-        let singleSends: boolean = true;  // Goes false if everyone is in the 'to send' part of the message
         
         // Right now checks that coms are like |sec|web|
         // Need opening and closing pipes
@@ -118,9 +148,16 @@ client.on('message', msg => {
           // Push all the reminders
           // Probably shouldn't do this one
         } else if (typeof args[2] === "string" && !isNaN(Number(args[2]))) {
+          // That line checks to make sure what was passed is a number
           // Push just the number given
-          reminder = reminderLoader.get_reminderByNum(Number(args[2]));
-          console.log(reminder);
+          if (reminderLoader.valid_num(Number(args[2]))) {
+            // Make sure we have a valid number first
+            reminder = reminderLoader.get_reminderByNum(Number(args[2]));
+            toSend = reminder.get_string();
+          } else {
+            // Bad number
+            sendMsg = false;
+          }
         } else {
           console.log("No idea which reminder to grab");
           sendMsg = false;
@@ -128,38 +165,8 @@ client.on('message', msg => {
 
         // Make sure user picked a valid reminder
         if (sendMsg) {
-          // Split on |, make Uppercase bc that's what is in server_info.json
-          // The map part trims whitespace of individual parts, so 'sec |sec' won't double send
-          let targetDiscords: string[] = communitiesArr[0].toLocaleUpperCase().split("|").map(item => item.trim());
-          let filteredTargets: string[] = [];
-          targetDiscords.filter((item: string, index: number) => {
-            if (targetDiscords.indexOf(item) === index)
-              filteredTargets.push(item);
-          });
-          console.log(filteredTargets);
-          // Parse what server to send the reminder to
-          if (filteredTargets.indexOf('EVERYONE') > -1) {
-            // Send to all discords
-            singleSends = false;    // Don't doouble send to individual stuff
-          }
-
-          if (singleSends) {
-            //console.log(setTarDiscords)
-            filteredTargets.forEach( function(community: string) {
-              // If input is '|sec|web|', the array will contain ['', 'SEC', 'WEB'],
-              // b/c .split('|') still matches the first '|'. Make sure the item we
-              // are sending to is not an empty string.
-              // This will still attempt to send to communities that do not exist,
-              // but we can just let the user know what communities we have sent to.
-              if (community) {
-                //send_to_channel(community.trim(), toSend);
-                console.log("Simulate sending");
-              }
-            });
-          }
+          send_to_channel(communitiesArr[0].trim(), toSend);
         }
-
-
       } else if (args[1] === "-l") {
         // List all reminders
 
@@ -217,6 +224,8 @@ client.on('message', msg => {
           }
           
         } else {
+          console.log(startdate);
+          console.log(enddate);
           msg.channel.send("Date was not valid. ex) 01/12/2019 12:00-01/12/2019 12:50");
           validConfig = false;
         }
@@ -227,7 +236,7 @@ client.on('message', msg => {
           let newReminder = new Reminder(name, location, startdate, enddate);
           newReminder.save();
 
-          msg.channel.send("Valid data message.")
+          msg.channel.send("Valid data message.");
           console.log("Valid data message.");
         } else {
           msg.channel.send("That wasn't quite right, follow the format below.");
@@ -243,4 +252,4 @@ client.on('message', msg => {
 });
 
 
-client.login(secrets.discord);
+client.login(config.token);
