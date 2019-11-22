@@ -1,4 +1,3 @@
-//import { resolveMx } from "dns";
 var fs = require('fs');
 
 let REMINDER_FNAME: string = "reminders.json";

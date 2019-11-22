@@ -12,8 +12,6 @@ let help_message: RichEmbed = new RichEmbed()
     .setTimestamp()
     .setFooter("If you have any questions, talk to Gavin Lewis. ")
 
-
-
 function cmd_help(message: Message) {
     message.channel.send(help_message);
 }
