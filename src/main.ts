@@ -4,6 +4,9 @@ import * as Discord from 'discord.js';
 
 import fs = require('fs');
 
+import { cmd_ping } from "./commands/ping";
+import { cmd_help } from "./commands/help";
+
 // Info on changing user's nick names
 //https://stackoverflow.com/questions/41247353/change-user-nickname-with-discord-js
 // setInterval() might be able to be used to delay a timed message
@@ -76,7 +79,7 @@ function send_to_channel(targets: string, message: string): void {
           if (channel) {
             console.log("Simulate sending")
             console.log(message);
-            //channel.send(message);
+            channel.send(message);
           } else {
             console.log("Channel: " + server_info[community].channel + " not found");
           }
@@ -86,7 +89,6 @@ function send_to_channel(targets: string, message: string): void {
       }
       catch (err) {
         console.log("Error sending the message.");
-        throw err;
       }
     }
   })
@@ -115,8 +117,7 @@ client.on('message', msg => {
   console.log(args);
 
   if (msg.content === 'ping') {
-    msg.channel.send('pong');
-    //msg.reply('pong');
+    cmd_ping(msg);
   }
 
   if (msg.content === '?tada') {
@@ -127,7 +128,7 @@ client.on('message', msg => {
 
     if (args[0] === "?help") {
       // Help function
-      msg.channel.send("Here to help, I will soon have commands for you.");
+      cmd_help(msg);
     }
 
     else if (args[0] === "?remind") {
