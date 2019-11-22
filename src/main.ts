@@ -113,7 +113,7 @@ client.on('message', msg => {
   }
 
   if (msg.content === '?tada') {
-    msg.channel.send('Its not party time.')
+    msg.channel.send('Its not party time. ')
   }
 
   if (cmdSwitch === '?') {

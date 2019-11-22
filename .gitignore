@@ -3,3 +3,5 @@ out/
 secrets.json
 reminders.json
 server_info.json
+package-lock.json
+config.json
