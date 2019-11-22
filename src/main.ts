@@ -1,7 +1,8 @@
 import { Reminder, ReminderLoader } from "./reminder";
-//import * as server_info from '../server_info.json'
+
 import * as Discord from 'discord.js';
-import { fstat } from "fs";
+
+import fs = require('fs');
 
 // Info on changing user's nick names
 //https://stackoverflow.com/questions/41247353/change-user-nickname-with-discord-js
@@ -17,6 +18,10 @@ interface DISCORD_INFO {
   ACMGeneral: DISCORD_DATA,
   CDT: DISCORD_DATA
 };
+// Info on seperating out the commands, kind of works but feels a bit wonk
+// Maybe just because im tired
+//https://discordjs.guide/command-handling/adding-features.html#a-dynamic-help-command
+
 
 interface CONFIG {
   prefix: string,
@@ -24,10 +29,10 @@ interface CONFIG {
 }
 
 //let secrets: { discord: string } = require("../secrets.json");
+let client = new Discord.Client();
 const config: CONFIG = require("../config.json");
 let server_info = require("../server_info.json");
 
-const client = new Discord.Client();
 
 // const DISCORD_INFO: ACMGuilds = {
 //   ACMGeneral: {
@@ -147,6 +152,7 @@ client.on('message', msg => {
         if (args[2] === "all") {
           // Push all the reminders
           // Probably shouldn't do this one
+          console.log("This will be implemented later.");
         } else if (typeof args[2] === "string" && !isNaN(Number(args[2]))) {
           // That line checks to make sure what was passed is a number
           // Push just the number given
@@ -233,7 +239,7 @@ client.on('message', msg => {
 
         if (validConfig) {
           // Got a valid data message, send it to the db
-          let newReminder = new Reminder(name, location, startdate, enddate);
+          let newReminder = new Reminder(msg.author.toString(), name, location, startdate, enddate);
           newReminder.save();
 
           msg.channel.send("Valid data message.");
