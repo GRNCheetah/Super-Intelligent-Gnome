@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node out/main.js",
     "dev": "nodemon src/main.ts",
+    "pull": "git pull;npm install",
     "build": "tsc -p .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -25,6 +26,9 @@
   "author": "Gavin Lewis",
   "license": "ISC",
   "nodemonConfig": {
-    "ignore": ["out/", "reminders.json"]
+    "ignore": [
+      "out/",
+      "reminders.json"
+    ]
   }
 }
