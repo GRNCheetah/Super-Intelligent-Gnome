@@ -57,7 +57,6 @@ client.on('message', msg => {
 
   if (cmdSwitch === '?') {
     if (args[0] === "?help") {
-      // Help function
       cmd_help(msg);
     } else if (args[0] === "?remind") {
       cmd_remind(msg, args, client);
