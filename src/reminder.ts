@@ -16,6 +16,7 @@ export class Reminder {
     private endDateTime: Date;
 
     constructor(creator: string, name:string, location: string, startDateTime: Date, endDateTime: Date) {
+        this.creator = creator;
         this.name = name;
         this.location = location;
         this.startDateTime = startDateTime;
@@ -53,17 +54,19 @@ export class Reminder {
 }
 
 export class ReminderLoader {
-    private reminderList: Array<Reminder>;
+    private reminderList: Reminder[];
     private numReminders: number;
     
     constructor() {
         // Loads all the reminders into a list.
         // Access all reminders or a single one through methods.
         let rawData: string = fs.readFileSync(REMINDER_FNAME, 'utf8');
-        
-        this.reminderList = JSON.parse(rawData)["reminders"];
-        this.numReminders = this.reminderList.length;
+        this.reminderList = require("../reminders.json")["reminders"] as Reminder[];
         console.log(this.reminderList);
+        console.log(this.reminderList[0]);  
+        //this.reminderList = JSON.parse(rawData)["reminders"] as Reminder[];
+        this.numReminders = this.reminderList.length;
+        //console.log(this.reminderList);
     }
 
     get_reminderList(): Array<Reminder> {
@@ -74,13 +77,15 @@ export class ReminderLoader {
     get_reminderByNum(num: number): Reminder {
         // Returns a single Reminder
         if (this.valid_num(num)) {
-            return this.reminderList[num];
+            console.log(this.reminderList[num-1]);
+            let rem: Reminder = this.reminderList[num-1];
+            return new Reminder(rem["creator"], rem["name"], rem["location"], rem["startDateTime"], rem["endDateTime"]);
         } else {
             return null
         }
     }
 
     valid_num(num: number): boolean {
-        return (num >= 0 && num < this.numReminders);
+        return (num > 0 && num <= this.numReminders);
     }
 }

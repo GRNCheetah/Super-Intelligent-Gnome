@@ -74,7 +74,9 @@ function send_to_channel(targets: string, message: string): void {
         if (guild) {
           let channel: Discord.TextChannel = guild.channels.find(channel => channel.name === server_info[community].channel) as Discord.TextChannel;
           if (channel) {
-            channel.send(message);
+            console.log("Simulate sending")
+            console.log(message);
+            //channel.send(message);
           } else {
             console.log("Channel: " + server_info[community].channel + " not found");
           }
@@ -159,9 +161,13 @@ client.on('message', msg => {
           if (reminderLoader.valid_num(Number(args[2]))) {
             // Make sure we have a valid number first
             reminder = reminderLoader.get_reminderByNum(Number(args[2]));
+            console.log(typeof (reminder));
             toSend = reminder.get_string();
+            console.log("Going to toSend");
           } else {
             // Bad number
+            console.log("not a number");
+            console.log(args[2]);
             sendMsg = false;
           }
         } else {
