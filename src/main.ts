@@ -41,8 +41,8 @@ client.on('message', msg => {
   // ignore bots and self, and messages that dont start with prefix
   if (msg.author.bot) return;
 
-  var args:string[] = msg.content.split(' ', 4);
-  var cmdSwitch:string = args[0].charAt(0);
+  var args: string[] = msg.content.split(' ', 4);
+  var cmdSwitch: string = args[0].charAt(0);
 
   console.log(args);
 
