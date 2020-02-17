@@ -1,6 +1,6 @@
 import { Client, Message, RichEmbed } from "discord.js";
 import { Reminder, ReminderLoader } from "../reminder";
-import { send_to_channel } from "../send";
+import { send_to_channel, send_checkup } from "../send";
 
 let help_message: RichEmbed = new RichEmbed()
     .setColor("#4AC55E")
@@ -63,7 +63,9 @@ function remind_push(msg: Message, args: string[], client: Client) {
 
     // Make sure user picked a valid reminder
     if (sendMsg) {
-        send_to_channel(communitiesArr[0].trim(), toSend, client);
+        // Used to straigh send the messge, now we do a check
+        //send_to_channel(communitiesArr[0].trim(), toSend, client);
+        send_checkup(msg, toSend, communitiesArr[0].trim());
     }
 }
 

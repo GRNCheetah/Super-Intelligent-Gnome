@@ -1,9 +1,12 @@
 import * as Discord from 'discord.js';
+// npm run dev
 
 // Import commands from the commands/ folder
 import { cmd_ping } from "./commands/ping";
 import { cmd_help } from "./commands/help";
 import { cmd_remind } from "./commands/remind";
+import { cmd_scream } from "./commands/scream";
+import { cmd_repeat } from "./commands/repeat";
 
 
 // Info on changing user's nick names
@@ -41,8 +44,8 @@ client.on('message', msg => {
   // ignore bots and self, and messages that dont start with prefix
   if (msg.author.bot) return;
 
-  var args: string[] = msg.content.split(' ', 4);
-  var cmdSwitch: string = args[0].charAt(0);
+  var args:string[] = msg.content.split(' ', 4);
+  var cmdSwitch:string = args[0].charAt(0);
 
   console.log(args);
 
@@ -50,18 +53,17 @@ client.on('message', msg => {
   if (msg.content === 'ping') {
     cmd_ping(msg);
   }
-
-  if (msg.content === '?tada') {
-    msg.channel.send('Its not party time. ')
-  }
-
-  if (cmdSwitch === '?') {
+  //console.log(msg.member.roles);
+  if (cmdSwitch === '?' && msg.member.roles.find(role => role.name === "Officers") && msg.member.guild.name === "ACM General") {
+    
     if (args[0] === "?help") {
       cmd_help(msg);
     } else if (args[0] === "?remind") {
       cmd_remind(msg, args, client);
-    } else if (args[0] === "?tada") {
-
+    } else if (args[0] === "?scream") {
+      cmd_scream(msg, client);
+    } else if (args[0] === "?repeat") {
+      cmd_repeat(msg);  
     } else {
       msg.channel.send(`Unkown command: ${args[0]}`);
     }
